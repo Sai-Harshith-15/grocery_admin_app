@@ -2,7 +2,6 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-
 import '../data/models/user_model.dart';
 import '../data/repositories/users_repository.dart';
 
@@ -13,10 +12,10 @@ class AllUsersController extends GetxController {
   var isLoading = true.obs;
   final usersList = <UserModel>[].obs;
 
+  final filterUsersList = <UserModel>[].obs;
+
   //adding for to select single user
-  // var selectedUser = Rxn<UserModel>();
   Rx<UserModel?> selectedUser = Rx<UserModel?>(null);
-  // var selectedRole = UserRole.Admin.obs;
   Rx<UserRole> selectedRole = UserRole.Admin.obs;
 
   TextEditingController userFullName = TextEditingController();
@@ -24,10 +23,19 @@ class AllUsersController extends GetxController {
   TextEditingController userPhoneNumber = TextEditingController();
   TextEditingController userPassword = TextEditingController();
 
+  //search
+
+  TextEditingController searchUsersContoller = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();
     fetchUsersFromFirebase();
+    searchUsersContoller.addListener(() {
+      searchUsersContoller.addListener(() {
+        filterUsers(searchUsersContoller.text);
+      });
+    });
   }
 
   @override
@@ -47,6 +55,7 @@ class AllUsersController extends GetxController {
       final fetchedUsers = await usersRepository.fetchUsersFromFirebase();
       if (fetchedUsers.isNotEmpty) {
         usersList.value = fetchedUsers;
+        filterUsersList.value = fetchedUsers;
       } else {
         print("No users fetched");
       }
@@ -54,6 +63,17 @@ class AllUsersController extends GetxController {
       print("Error fetching users: $e");
     } finally {
       isLoading(false);
+    }
+  }
+
+  void filterUsers(String data) {
+    if (data.isEmpty) {
+      filterUsersList.value = usersList;
+    } else {
+      filterUsersList.value = usersList
+          .where((user) =>
+              user.fullName.toLowerCase().contains(data.toLowerCase()))
+          .toList();
     }
   }
 

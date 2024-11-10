@@ -1,20 +1,15 @@
 // ignore_for_file: avoid_print
-
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-
+import '../../../../constants/app_colors.dart';
 import '../../../../controllers/all_categories_controller.dart';
-import '../../../../routes/routes.dart';
-import '../../../constants/app_colors.dart';
-import '../../widgets/my_app_bar.dart';
-import '../../widgets/mytext.dart';
-import '../../widgets/responsive.dart';
-import '../../widgets/textfield.dart';
+import '../../../widgets/my_app_bar.dart';
+import '../../../widgets/mytext.dart';
+import '../../../widgets/responsive.dart';
+import '../../../widgets/textfield.dart';
 
 class AddCategoriesScreen extends StatefulWidget {
   const AddCategoriesScreen({super.key});
@@ -26,22 +21,17 @@ class AddCategoriesScreen extends StatefulWidget {
 class _AddCategoriesScreenState extends State<AddCategoriesScreen> {
   final AllCategoriesController allCategoriesController =
       Get.find<AllCategoriesController>();
+
+  // final SidebarController sidebarController = Get.find<SidebarController>();
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-
     // Schedule clearing of text controllers after the first frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       allCategoriesController.categoryNameController.clear();
       allCategoriesController.categoryDescriptionController.clear();
-
-      // Optional: Debugging print statements
-      print(
-          "Category Name cleared: ${allCategoriesController.categoryNameController.text}");
-      print(
-          "Category Description cleared: ${allCategoriesController.categoryDescriptionController.text}");
     });
   }
 
@@ -54,11 +44,14 @@ class _AddCategoriesScreenState extends State<AddCategoriesScreen> {
             : Scaffold(
                 backgroundColor: AppColors.background,
                 appBar: MyAppBar(
-                  leading: IconButton(
+                  /* leading: IconButton(
                       onPressed: () {
-                        Get.toNamed(AppRoutes.allCategoriesScreen);
+                        /* Get.toNamed(AppRoutes.allCategoriesScreen); */
+                       /*  sidebarController.setPageByRoute(
+                          AppRoutes.sidebarScreen,
+                        ); */
                       },
-                      icon: const Icon(Icons.arrow_back)),
+                      icon: const Icon(Icons.arrow_back)), */
                   title: "Add Category Screen",
                 ),
                 body: Center(

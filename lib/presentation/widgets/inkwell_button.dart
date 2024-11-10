@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants/app_colors.dart';
+import '../../../../constants/app_colors.dart';
 import 'mytext.dart';
 import 'responsive.dart';
 
@@ -21,7 +21,7 @@ class _InkWellButtonState extends State<InkWellButton> {
           ? 342
           : 240,
       decoration: BoxDecoration(
-        color: AppColors.primarygreen,
+        color: AppColors.primaryGreen,
         borderRadius: BorderRadius.circular(60),
       ),
       child: InkWell(

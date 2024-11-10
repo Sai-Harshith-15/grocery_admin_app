@@ -17,6 +17,8 @@ class AllProductsController extends GetxController {
   var productsList = <ProductModel>[].obs;
   var categoryList = <CategoryModel>[].obs;
 
+  var filteredProductsList = <ProductModel>[].obs;
+
   // Category handling (selected category)
   Rx<CategoryModel?> selectedCategory = Rx<CategoryModel?>(null);
 
@@ -43,22 +45,30 @@ class AllProductsController extends GetxController {
   TextEditingController stockQuantityController = TextEditingController();
   TextEditingController stockThresholdController = TextEditingController();
 
+  //search
+
+  TextEditingController searchProductsController = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();
     fetchCategories();
     fetchProductsFromFirebase();
+    searchProductsController.addListener(() {
+      filterProducts(searchProductsController.text);
+    });
   }
 
   @override
   void onClose() {
+    super.onClose();
     productNameController.dispose();
     productDescriptionController.dispose();
     productPriceController.dispose();
     productDiscountController.dispose();
     stockQuantityController.dispose();
     stockThresholdController.dispose();
-    super.onClose();
+    searchProductsController.dispose();
   }
 
   // Fetch categories from Firebase
@@ -84,6 +94,7 @@ class AllProductsController extends GetxController {
           await productsRepository.fetchProductsFromFirebase();
       if (fetchProducts.isNotEmpty) {
         productsList.value = fetchProducts;
+        filteredProductsList.value = fetchProducts;
       } else {
         print("Products not Found");
       }
@@ -93,6 +104,21 @@ class AllProductsController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  //fileter fun
+
+  void filterProducts(String data) {
+    if (data.isEmpty) {
+      filteredProductsList.value = productsList;
+    } else {
+      filteredProductsList.value = productsList
+          .where((product) =>
+              product.productName.toLowerCase().contains(data.toLowerCase()))
+          .toList();
+    }
+  }
+
+  //fetch product by id
 
   Future<void> fetchProductById(String productId) async {
     try {
@@ -108,6 +134,21 @@ class AllProductsController extends GetxController {
         productDiscountController.text = product.productDiscount.toString();
         stockQuantityController.text = product.stockQuantity.toString();
         stockThresholdController.text = product.stockThreshold.toString();
+        uploadedCoverImageUrl.value =
+            product.coverImg.isNotEmpty ? product.coverImg : "";
+        uploadedImageUrl.value =
+            product.urlImages.isNotEmpty ? product.urlImages : [''];
+
+        // Set the selected category using the categoryId from the fetched product
+        try {
+          selectedCategory.value = categoryList.firstWhere(
+            (category) => category.categoryId == product.categoryId,
+          );
+        } catch (e) {
+          // Handle the case where no category matches (e.g., set to null)
+          selectedCategory.value = null;
+          print("No matching category found: $e");
+        }
       } else {
         print("Product not Found");
       }
@@ -230,9 +271,18 @@ class AllProductsController extends GetxController {
   }
 
   // Remove the selected multiple images
-  void removeSelectedImages() {
+  /*  void removeSelectedImages() {
     selectedImages.clear();
     webImageBytesList.clear();
+  } */
+
+  void removeSelectedImages(int index) {
+    if (kIsWeb) {
+      webImageBytesList.removeAt(index);
+    } else {
+      selectedImages.removeAt(index);
+    }
+    update(); // Update the UI after removing the image
   }
 
   //storage
@@ -335,5 +385,112 @@ class AllProductsController extends GetxController {
     selectedCategory.value = null;
     webCoverImageBytes.value = null;
     webImageBytesList.clear();
+  }
+
+  //updated products
+
+  Future<void> updatedProductFromFirebase(String productId) async {
+    if (productNameController.text.isEmpty ||
+        productDescriptionController.text.isEmpty ||
+        productPriceController.text.isEmpty ||
+        productDiscountController.text.isEmpty ||
+        stockQuantityController.text.isEmpty ||
+        stockThresholdController.text.isEmpty ||
+        coverImage.value != null ||
+        selectedImages.isEmpty) {
+      Get.snackbar('Error', 'Please provide all required fields and an image');
+      return;
+    }
+    try {
+      isLoading.value = true;
+
+      if (coverImage.value != null) {
+        final coverImgUrl = await productsRepository
+            .uploadProductsImageToStorage(coverImage.value!);
+
+        uploadedCoverImageUrl.value = coverImgUrl;
+      } else if (selectedImages.isNotEmpty) {
+        for (var images in selectedImages) {
+          final selectedImgUrl =
+              await productsRepository.uploadProductsImageToStorage(images);
+          uploadedImageUrl.add(selectedImgUrl);
+        }
+      }
+
+      double productPrice =
+          double.tryParse(productPriceController.text.trim()) ?? 0.0;
+
+      int productDiscount =
+          int.tryParse(productDiscountController.text.trim()) ?? 0;
+
+      int stockQuantity =
+          int.tryParse(stockQuantityController.text.trim()) ?? 0;
+      int stockThreshold =
+          int.tryParse(stockThresholdController.text.trim()) ?? 0;
+      String categoryId = selectedCategory.value!.categoryId;
+      String categoryName = selectedCategory.value!.categoryName;
+
+      await productsRepository.UpdateProductFromFirebase(
+        productId,
+        productNameController.text.trim(),
+        productDescriptionController.text.trim(),
+        productPrice,
+        productDiscount,
+        categoryId,
+        categoryName,
+        uploadedCoverImageUrl.value,
+        uploadedImageUrl,
+        stockQuantity,
+        stockThreshold,
+      );
+      clearForm();
+      Get.snackbar('Success', 'Product updated successfully');
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to update product: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  //delet images
+
+  Future<void> deleteImagesFromStorage(dynamic imageUrls) async {
+    try {
+      isLoading.value = true;
+      if (imageUrls is String) {
+        await productsRepository.deleteImagesFromStorage(imageUrls);
+        print("single images deleted");
+      } else if (imageUrls is List<String>) {
+        for (String url in imageUrls) {
+          try {
+            await productsRepository.deleteImagesFromStorage(url);
+            print("multiple images deleted");
+          } catch (e) {
+            print("error deleting images $e");
+          }
+        }
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Failed while deleting the product image: $e");
+      print("Error while deleting the product image: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  //delete product
+
+  Future<void> deleteProductFromFirebase(String productId) async {
+    try {
+      isLoading.value = true;
+      productsList.value =
+          await productsRepository.deleteProductFromFirebase(productId);
+      Get.snackbar('Success', 'Product deleted successfully');
+    } catch (e) {
+      Get.snackbar("Error", "Failed to delete the Product: $e");
+      print("Error deleting product: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

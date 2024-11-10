@@ -73,10 +73,10 @@ class UsersServices implements Interfaces {
       // Save user data in Firestore with server-side timestamps
       await firebaseFirestore.collection('users').doc(newUser.userId).set({
         ...newUser.toMap(),
-        'createdAt':
-            FieldValue.serverTimestamp(), // Use Firestore server timestamp
-        'updatedAt':
-            FieldValue.serverTimestamp(), // Use Firestore server timestamp
+        'createdAt': /* FieldValue.serverTimestamp() */
+            Timestamp.now(), // Use Firestore server timestamp
+        'updatedAt': /* FieldValue.serverTimestamp() */
+            Timestamp.now(), // Use Firestore server timestamp
       });
 
       // Fetch updated list of users from Firestore
@@ -89,7 +89,7 @@ class UsersServices implements Interfaces {
 
   @override
   Future<List<UserModel>> updateUserFromFirebase(
-    String userId, // Add this parameter
+    String userId,
     String fullName,
     String email,
     String phoneNumber,
@@ -149,7 +149,7 @@ class UsersServices implements Interfaces {
         'password': password,
         'phoneNumber': phoneNumber,
         'role': role.toString().split('.').last,
-        'updatedAt': Timestamp.now(), // Only updating updatedAt
+        'updatedAt': Timestamp.now(),
         'userImg': '',
       });
 

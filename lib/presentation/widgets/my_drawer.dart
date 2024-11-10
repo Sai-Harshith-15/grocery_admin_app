@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../constants/app_colors.dart';
+import 'package:get/get_core/src/get_main.dart';
+import '../../constants/appcolors.dart';
 import '../../routes/routes.dart';
 import 'mytext.dart';
 
@@ -160,3 +161,4 @@ class MyDrawer extends StatelessWidget {
     );
   }
 }
+ */

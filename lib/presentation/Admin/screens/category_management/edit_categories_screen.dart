@@ -1,15 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../constants/app_colors.dart';
 import '../../../../controllers/all_categories_controller.dart';
 import '../../../../data/models/category_model.dart';
-import '../../../constants/app_colors.dart';
-import '../../widgets/my_app_bar.dart';
-import '../../widgets/mytext.dart';
-import '../../widgets/responsive.dart';
-import '../../widgets/textfield.dart';
+import '../../../widgets/my_app_bar.dart';
+import '../../../widgets/mytext.dart';
+import '../../../widgets/responsive.dart';
+import '../../../widgets/textfield.dart';
 
 class EditCategoryScreen extends StatefulWidget {
-  const EditCategoryScreen({super.key});
+  final CategoryModel? category;
+  const EditCategoryScreen({super.key, this.category});
 
   @override
   State<EditCategoryScreen> createState() => _EditCategoryScreenState();
@@ -19,16 +21,15 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
   final AllCategoriesController allCategoriesController =
       Get.find<AllCategoriesController>();
 
-  String? categoryId;
+  // String? categoryId;
 
   @override
   void initState() {
     super.initState();
-    categoryId = (Get.arguments as CategoryModel?)?.categoryId;
-    if (categoryId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        allCategoriesController.fetchCategoryById(categoryId!);
-      });
+
+    // Initialize controller with passed user data
+    if (widget.category != null) {
+      allCategoriesController.fetchCategoryById(widget.category!.categoryId);
     }
   }
 
@@ -41,7 +42,7 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
             backgroundColor: AppColors.background,
             appBar: MyAppBar(title: 'Category Details'),
             body: const Center(
-              child: CircularProgressIndicator(),
+              child: CupertinoActivityIndicator(),
             ),
           );
         }
@@ -59,7 +60,7 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
           child: Scaffold(
             backgroundColor: AppColors.background,
             appBar: MyAppBar(
-              title: 'Edit ${category.categoryName} Details',
+              title: 'Edit ${widget.category!.categoryName} Details',
             ),
             body: Center(
               child: SingleChildScrollView(
@@ -141,7 +142,8 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
 
                             // Call the update category function
                             await allCategoriesController
-                                .updateCategoriesFromFirebase(categoryId!);
+                                .updateCategoriesFromFirebase(
+                                    widget.category!.categoryId);
                             Get.snackbar(
                                 'Success', 'Category updated successfully');
                             Get.back(); // Navigate back after updating

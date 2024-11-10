@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../controllers/all_users_controller.dart';
 import '../../../../data/models/user_model.dart';
-import '../../../../routes/routes.dart';
-import '../../../constants/app_colors.dart';
-import '../../widgets/my_app_bar.dart';
-import '../../widgets/mytext.dart';
-import '../../widgets/responsive.dart';
-import '../../widgets/textfield.dart';
+import '../../../widgets/my_app_bar.dart';
+import '../../../widgets/mytext.dart';
+import '../../../widgets/responsive.dart';
+import '../../../../constants/app_colors.dart';
+
+import '../../../widgets/textfield.dart';
 
 class AddUserScreen extends StatefulWidget {
   const AddUserScreen({super.key});
@@ -40,15 +40,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: AppColors.background,
-        appBar: MyAppBar(
-            leading: IconButton(
-                onPressed: () {
-                  Get.toNamed(AppRoutes.allUsersScreen);
-                },
-                icon: const Icon(
-                  Icons.arrow_back,
-                )),
-            title: 'Add User Screen'),
+        appBar: MyAppBar(title: 'Add User Screen'),
         body: Center(
           child: SingleChildScrollView(
             child: ConstrainedBox(
@@ -69,6 +61,24 @@ class _AddUserScreenState extends State<AddUserScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      ListTile(
+                        leading:
+                            Icon(Icons.person, color: AppColors.primaryBlack),
+                        title: const HeadText(
+                          text: 'Active User',
+                          textSize: 16,
+                          textWeight: FontWeight.bold,
+                        ),
+                        trailing: Switch(
+                          value: true,
+                          onChanged: (value) {
+                            /* setState(() {
+                              // darkModeEnabled = value;
+                            }); */
+                          },
+                          activeColor: AppColors.TertiaryGreen,
+                        ),
+                      ),
                       CustomTextField(
                         controller: allUsersController.userFullName,
                         hintText: 'Full Name',

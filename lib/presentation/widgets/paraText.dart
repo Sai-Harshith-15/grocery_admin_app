@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../constants/app_colors.dart';
+import '../../../../constants/app_colors.dart';
 
 class ParaText extends StatefulWidget {
   const ParaText({
@@ -45,7 +45,7 @@ class _ParaTextState extends State<ParaText> {
           fontFamily: widget.fontfamily,
           fontSize: widget.textSize ?? 11,
           letterSpacing: widget.letterSpacing,
-          color: widget.textColor ?? AppColors.secondarytext,
+          color: widget.textColor ?? AppColors.primaryBlack,
           fontWeight: widget.textWeight ?? FontWeight.w500,
           fontStyle: widget.textFontStyle,
           overflow:

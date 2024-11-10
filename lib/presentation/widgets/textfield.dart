@@ -1,8 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../constants/app_colors.dart';
+import '../../../../constants/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextAlignVertical? textalignVertical;
@@ -72,7 +71,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return Padding(
       padding: const EdgeInsets.all(0.0),
       child: TextFormField(
-        cursorColor: AppColors.secondarytext,
+        cursorColor: AppColors.primaryBlack,
         style: /* widget.textStyle */ const TextStyle(fontFamily: "Quicksand"),
         onTap: widget.onTap ?? () {},
         readOnly: widget.readOnly ?? false,
@@ -88,9 +87,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
         textAlignVertical: widget.textalignVertical,
         maxLines: widget.maxLines ?? 1,
         decoration: InputDecoration(
+          prefix: Icon(widget.prefix),
           suffixIcon: widget.suffixIcon,
           hintText: widget.hintText,
-          hintStyle: TextStyle(color: AppColors.textcolor),
+          hintStyle: TextStyle(color: AppColors.primaryBlack),
 
           // Border settings: only bottom border is visible in grey
           enabledBorder: const UnderlineInputBorder(

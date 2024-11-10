@@ -3,12 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../constants/app_colors.dart';
-import '../../widgets/my_app_bar.dart';
-import '../../widgets/mytext.dart';
-import '../../widgets/responsive.dart';
+import '../../../../constants/app_colors.dart';
 import '../../../../controllers/all_products_controller.dart';
-import '../../widgets/textfield.dart';
+import '../../../widgets/my_app_bar.dart';
+import '../../../widgets/mytext.dart';
+import '../../../widgets/responsive.dart';
+import '../../../widgets/textfield.dart';
 
 class AddProductsScreen extends StatefulWidget {
   const AddProductsScreen({super.key});
@@ -21,6 +21,19 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
   final AllProductsController allProductsController =
       Get.find<AllProductsController>();
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      allProductsController.productNameController.clear();
+      allProductsController.productDescriptionController.clear();
+      allProductsController.productPriceController.clear();
+      allProductsController.productDiscountController.clear();
+      allProductsController.stockQuantityController.clear();
+      allProductsController.stockThresholdController.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +149,7 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                               const SizedBox(height: 20),
                               // Select Category Dropdown
                               Obx(() => DropdownButtonFormField<String>(
+                                    dropdownColor: AppColors.background,
                                     value: allProductsController
                                         .selectedCategory.value?.categoryId,
                                     hint: const HeadText(
@@ -320,7 +334,8 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                                                   child: InkWell(
                                                     onTap: () {
                                                       allProductsController
-                                                          .removeSelectedImages();
+                                                          .removeSelectedImages(
+                                                              index);
                                                     },
                                                     child: const CircleAvatar(
                                                       backgroundColor:
@@ -344,6 +359,12 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
 
 // Add Product Button
                               ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryGreen,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
                                     allProductsController.isLoading.value =
@@ -354,7 +375,10 @@ class _AddProductsScreenState extends State<AddProductsScreen> {
                                         false;
                                   }
                                 },
-                                child: const HeadText(text: 'Add Product'),
+                                child: HeadText(
+                                  text: 'Add Product',
+                                  textColor: AppColors.background,
+                                ),
                               ),
                             ],
                           ),

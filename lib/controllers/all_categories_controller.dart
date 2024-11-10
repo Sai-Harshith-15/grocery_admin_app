@@ -14,6 +14,7 @@ class AllCategoriesController extends GetxController {
 
   var isLoading = false.obs;
   var categoriesList = <CategoryModel>[].obs;
+  var filteredCategoriesList = <CategoryModel>[].obs;
   Rx<CategoryModel?> selectedCategory = Rx<CategoryModel?>(null);
 
   final ImagePicker imagePicker = ImagePicker(); // Image picker instance
@@ -24,11 +25,16 @@ class AllCategoriesController extends GetxController {
   // For category inputs
   TextEditingController categoryNameController = TextEditingController();
   TextEditingController categoryDescriptionController = TextEditingController();
+  //search
+  TextEditingController searchCategoriesController = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
     fetchCategoriesFromFirebase();
+    searchCategoriesController.addListener(() {
+      filterCategories(searchCategoriesController.text);
+    });
   }
 
   @override
@@ -36,6 +42,7 @@ class AllCategoriesController extends GetxController {
     super.onClose();
     categoryNameController.dispose();
     categoryDescriptionController.dispose();
+    searchCategoriesController.dispose();
   }
 
   // Fetch categories from Firebase
@@ -46,6 +53,8 @@ class AllCategoriesController extends GetxController {
           await categoryRepository.fetchCategoriesFromFirebase();
       if (fetchCategories.isNotEmpty) {
         categoriesList.value = fetchCategories;
+        filteredCategoriesList.value =
+            fetchCategories; // Initialize filtered list
       } else {
         print("No Categories Found");
       }
@@ -53,6 +62,18 @@ class AllCategoriesController extends GetxController {
       print('Error fetching categories: $e');
     } finally {
       isLoading(false);
+    }
+  }
+
+  // Filter categories based on search query
+  void filterCategories(String data) {
+    if (data.isEmpty) {
+      filteredCategoriesList.value = categoriesList;
+    } else {
+      filteredCategoriesList.value = categoriesList
+          .where((category) =>
+              category.categoryName.toLowerCase().contains(data.toLowerCase()))
+          .toList();
     }
   }
 

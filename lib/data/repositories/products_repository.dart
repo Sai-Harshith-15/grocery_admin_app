@@ -46,6 +46,36 @@ class ProductsRepository {
     );
   }
 
+  //update products
+
+  Future<List<ProductModel>> UpdateProductFromFirebase(
+    String productId,
+    String productName,
+    String productDescription,
+    double productPrice,
+    int productDiscount,
+    String categoryId,
+    String categoryName,
+    String coverImg,
+    List<String> urlImages,
+    int stockQuantity,
+    int stockThreshold,
+  ) async {
+    return interfaces.UpdateProductFromFirebase(
+      productId,
+      productName,
+      productDescription,
+      productPrice,
+      productDiscount,
+      categoryId,
+      categoryName,
+      coverImg,
+      urlImages,
+      stockQuantity,
+      stockThreshold,
+    );
+  }
+
 //for drop down
   Future<List<CategoryModel>> fetchCategoriesFromFirebase() async {
     return interfaces.fetchCategoriesFromFirebase();
@@ -54,5 +84,16 @@ class ProductsRepository {
 //store
   Future<String> uploadProductsImageToStorage(XFile image) async {
     return interfaces.uploadProductImageToStorage(image);
+  }
+
+  //delete images form storage
+  Future<void> deleteImagesFromStorage(dynamic imageUrls) async {
+    return interfaces.deleteImagesFromStorage(imageUrls);
+  }
+
+  //delete
+
+  Future<List<ProductModel>> deleteProductFromFirebase(String productId) async {
+    return interfaces.deleteProductFromFirebase(productId);
   }
 }

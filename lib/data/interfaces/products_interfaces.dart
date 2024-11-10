@@ -24,6 +24,27 @@ abstract class ProductsInterfaces {
   //fetch single product from firebase
   Future<ProductModel?> fetchsingleProductFromFirebase(String productId);
 
+  Future<List<ProductModel>> UpdateProductFromFirebase(
+    String productId,
+    String productName,
+    String productDescription,
+    double productPrice,
+    int productDiscount,
+    String categoryId,
+    String categoryName,
+    String coverImg,
+    List<String> urlImages,
+    int stockQuantity,
+    int stockThreshold,
+  );
+
   //store
   Future<String> uploadProductImageToStorage(XFile image);
+
+  //delete images in storage
+  Future<void> deleteImagesFromStorage(dynamic imageUrls);
+
+  //delete
+
+  Future<List<ProductModel>> deleteProductFromFirebase(String productId);
 }
