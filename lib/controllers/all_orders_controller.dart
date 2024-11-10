@@ -42,19 +42,27 @@ class AllOrdersController extends GetxController {
     });
   }
 
-  void filterOrders(String data) {
-    if (data.isEmpty) {
+  void filterOrders(String query) async {
+    if (query.isEmpty) {
       filterOrderList.assignAll(ordersList);
     } else {
-      filterOrderList.value = ordersList
-          .where((order) =>
-              order.orderId.toLowerCase().contains(data.toLowerCase()))
-          .toList();
-      filterOrderList.value = ordersList
-          .where((order) => Globals.formatTimestamp(order.createdAt)
-              .toLowerCase()
-              .contains(data.toLowerCase()))
-          .toList();
+      // Filter by orderId and createdAt first
+      List<OrderModel> filteredOrders = ordersList.where((order) {
+        final matchesOrderId =
+            order.orderId.toLowerCase().contains(query.toLowerCase());
+        final matchesCreatedAt = Globals.formatTimestamp(order.createdAt)
+            .toLowerCase()
+            .contains(query.toLowerCase());
+        return matchesOrderId || matchesCreatedAt;
+      }).toList();
+
+      // Check if the query might match an email
+      if (filteredOrders.isEmpty) {
+        // Perform email-based filtering if no other match
+        filteredOrders = await fetchUsersEmailFromFirebase(query);
+      }
+
+      filterOrderList.assignAll(filteredOrders);
     }
   }
 
@@ -218,6 +226,24 @@ class AllOrdersController extends GetxController {
     } catch (e) {
       print("Error in copying the details: $e");
     }
+  }
+
+  //for searching the user email
+  Future<List<OrderModel>> fetchUsersEmailFromFirebase(String email) async {
+    List<OrderModel> filteredOrders = [];
+    try {
+      for (OrderModel order in ordersList) {
+        final userEmail =
+            await ordersRepository.fetchUsersEmailFromFirebase(order.userId);
+        if (userEmail != null &&
+            userEmail.toLowerCase().contains(email.toLowerCase())) {
+          filteredOrders.add(order);
+        }
+      }
+    } catch (e) {
+      print("Error in fetching all users email: $e");
+    }
+    return filteredOrders;
   }
 
   @override

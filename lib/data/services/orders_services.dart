@@ -206,4 +206,21 @@ class OrdersServices implements OrdersInterfaces {
       rethrow;
     }
   }
+
+  @override
+  Future<String?> fetchUsersEmailFromFirebase(
+    String userId,
+  ) async {
+    try {
+      DocumentSnapshot userDoc =
+          await Globals.firestore.collection('users').doc(userId).get();
+
+      if (userDoc.exists) {
+        return userDoc['email'] ?? '';
+      }
+    } catch (e) {
+      print("Error fetching user email: $e");
+    }
+    return null;
+  }
 }

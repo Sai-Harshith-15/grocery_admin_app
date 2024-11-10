@@ -24,4 +24,9 @@ abstract class OrdersInterfaces {
       String orderId, String userId, OrderStatus status);
 
   Future<void> toggleIsActiveUser(bool isActive, String userId);
+
+  //fetch the all user's email
+  Future<String?> fetchUsersEmailFromFirebase(
+    String userId,
+  );
 }

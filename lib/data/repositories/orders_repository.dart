@@ -42,4 +42,10 @@ class OrdersRepository {
   Future<void> toggleIsActiveUser(bool isActive, String userId) async {
     return interfaces.toggleIsActiveUser(isActive, userId);
   }
+
+  Future<String?> fetchUsersEmailFromFirebase(
+    String userId,
+  ) async {
+    return interfaces.fetchUsersEmailFromFirebase(userId);
+  }
 }

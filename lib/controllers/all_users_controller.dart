@@ -181,4 +181,5 @@ class AllUsersController extends GetxController {
       isLoading.value = false;
     }
   }
+  
 }
